@@ -59,6 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Error al subir el archivo.';
         }
+    } elseif (isset($_POST['guardar_bd'])) {
+        // Guardar datos en la base de datos
+        if (isset($_SESSION['excel_data']) && !empty($_SESSION['excel_data'])) {
+            try {
+                $datos_sin_encabezados = array_slice($_SESSION['excel_data'], 1); // Excluir encabezados
+                $registros_guardados = guardarContratos($datos_sin_encabezados, $_SESSION['user_id']);
+                $success = "✅ Se guardaron exitosamente $registros_guardados contratos en la base de datos.";
+                unset($_SESSION['excel_data']); // Limpiar datos de sesión
+                $excel_data = []; // Limpiar datos de la vista
+            } catch (Exception $e) {
+                $error = 'Error al guardar en la base de datos: ' . $e->getMessage();
+            }
+        } else {
+            $error = 'No hay datos para guardar. Primero sube un archivo CSV.';
+        }
     }
 }
 
@@ -67,10 +82,25 @@ if (isset($_SESSION['excel_data'])) {
     $excel_data = $_SESSION['excel_data'];
 }
 
-// Calcular paginación
+// Calcular paginación para datos del CSV
 $total_registros = count($excel_data) - 1; // Restamos 1 para excluir los encabezados
 $total_paginas = ceil($total_registros / $registros_por_pagina);
 $inicio = ($pagina_actual - 1) * $registros_por_pagina;
+
+// Obtener contratos guardados en la base de datos
+$contratos_bd = [];
+$total_contratos_bd = 0;
+try {
+    $total_contratos_bd = contarContratosUsuario($_SESSION['user_id']);
+    if ($total_contratos_bd > 0) {
+        $contratos_bd = obtenerContratosUsuario($_SESSION['user_id'], $registros_por_pagina, $inicio);
+    }
+} catch (Exception $e) {
+    $error = 'Error al obtener contratos de la base de datos: ' . $e->getMessage();
+}
+
+// Calcular paginación para contratos de la BD
+$total_paginas_bd = ceil($total_contratos_bd / $registros_por_pagina);
 
 // Obtener datos de la página actual
 $datos_pagina = [];
@@ -328,6 +358,59 @@ if (!empty($excel_data)) {
             margin: 5px 0;
             color: #333;
         }
+        
+        .save-section {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .save-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+        }
+        
+        .save-info {
+            color: #2e7d32;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .new-contract-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        .new-contract-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+            color: white;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body class="page-container">
@@ -350,7 +433,10 @@ if (!empty($excel_data)) {
         <?php endif; ?>
         
         <div class="upload-section">
-            <h2 class="upload-title">📊 Subir Archivo de Contratos</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="upload-title">📊 Subir Archivo de Contratos</h2>
+                <a href="nuevo-contrato.php" class="new-contract-btn">➕ Crear Nuevo Contrato</a>
+            </div>
             
             <div class="instructions">
                 <h4>📋 Instrucciones:</h4>
@@ -373,6 +459,15 @@ if (!empty($excel_data)) {
         <?php if (!empty($excel_data)): ?>
             <div class="excel-section">
                 <h2 class="upload-title">📋 Datos de Contratos</h2>
+                
+                <div class="save-section">
+                    <form method="POST" style="display: inline;">
+                        <button type="submit" name="guardar_bd" class="save-btn" onclick="return confirm('¿Estás seguro de que quieres guardar estos contratos en la base de datos?')">
+                            💾 Guardar en Base de Datos
+                        </button>
+                    </form>
+                    <span class="save-info">Los datos se guardarán permanentemente en la base de datos</span>
+                </div>
                 
                 <div class="data-summary">
                     <h4>📊 Resumen de Datos</h4>
@@ -504,6 +599,169 @@ if (!empty($excel_data)) {
                 <p>Sube un archivo CSV para ver los datos de contratos aquí.</p>
             </div>
         <?php endif; ?>
+        
+        <!-- Sección de contratos guardados en la base de datos -->
+        <?php if ($total_contratos_bd > 0): ?>
+            <div class="excel-section">
+                <h2 class="upload-title">💾 Contratos Guardados en Base de Datos</h2>
+                
+                <div class="data-summary">
+                    <h4>📊 Resumen de Contratos Guardados</h4>
+                    <p><strong>Total de contratos guardados:</strong> <?php echo $total_contratos_bd; ?></p>
+                    <p><strong>Registros por página:</strong> <?php echo $registros_por_pagina; ?></p>
+                    <p><strong>Página actual:</strong> <?php echo $pagina_actual; ?> de <?php echo $total_paginas_bd; ?></p>
+                </div>
+                
+                <!-- Controles de paginación para contratos BD -->
+                <div class="pagination-controls">
+                    <div class="records-selector">
+                        <label for="registros_bd">Mostrar:</label>
+                        <select id="registros_bd" onchange="cambiarRegistrosBD(this.value)">
+                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
+                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
+                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="pagination-info">
+                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_contratos_bd); ?> de <?php echo $total_contratos_bd; ?> contratos
+                    </div>
+                    
+                    <div class="pagination">
+                        <?php if ($pagina_actual > 1): ?>
+                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
+                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
+                        <?php else: ?>
+                            <span class="disabled">« Primera</span>
+                            <span class="disabled">‹ Anterior</span>
+                        <?php endif; ?>
+                        
+                        <?php
+                        $inicio_paginas = max(1, $pagina_actual - 2);
+                        $fin_paginas = min($total_paginas_bd, $pagina_actual + 2);
+                        
+                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
+                        ?>
+                            <?php if ($i == $pagina_actual): ?>
+                                <span class="current"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+                        
+                        <?php if ($pagina_actual < $total_paginas_bd): ?>
+                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
+                            <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
+                        <?php else: ?>
+                            <span class="disabled">Siguiente ›</span>
+                            <span class="disabled">Última »</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="excel-table">
+                        <thead>
+                            <tr>
+                                <th>AÑO</th>
+                                <th>Empresa</th>
+                                <th>CLIENTE</th>
+                                <th>No contrato</th>
+                                <th>Valor en pesos sin IVA</th>
+                                <th>Valor en dólares</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Valor Mensual</th>
+                                <th>Observaciones</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Vencimiento</th>
+                                <th>Valor Facturado</th>
+                                <th>% Ejecución</th>
+                                <th>Valor Pendiente</th>
+                                <th>Estado</th>
+                                <th>No de horas</th>
+                                <th>Factura No</th>
+                                <th>No de Póliza</th>
+                                <th>Fecha Vencimiento Póliza</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($contratos_bd as $contrato): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($contrato['ano'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['empresa'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['cliente'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['no_contrato'] ?? ''); ?></td>
+                                    <td><?php echo $contrato['valor_pesos_sin_iva'] ? '$' . number_format($contrato['valor_pesos_sin_iva'], 2) : ''; ?></td>
+                                    <td><?php echo $contrato['valor_dolares'] ? '$' . number_format($contrato['valor_dolares'], 2) : ''; ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['descripcion'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['categoria'] ?? ''); ?></td>
+                                    <td><?php echo $contrato['valor_mensual'] ? '$' . number_format($contrato['valor_mensual'], 2) : ''; ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['observaciones'] ?? ''); ?></td>
+                                    <td><?php echo $contrato['fecha_inicio'] ? date('d/m/Y', strtotime($contrato['fecha_inicio'])) : ''; ?></td>
+                                    <td><?php echo $contrato['fecha_vencimiento'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento'])) : ''; ?></td>
+                                    <td><?php echo $contrato['valor_facturado'] ? '$' . number_format($contrato['valor_facturado'], 2) : ''; ?></td>
+                                    <td><?php echo $contrato['porcentaje_ejecucion'] ? $contrato['porcentaje_ejecucion'] . '%' : ''; ?></td>
+                                    <td><?php echo $contrato['valor_pendiente_ejecutar'] ? '$' . number_format($contrato['valor_pendiente_ejecutar'], 2) : ''; ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['estado'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['no_horas'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['factura_no'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($contrato['no_poliza'] ?? ''); ?></td>
+                                    <td><?php echo $contrato['fecha_vencimiento_poliza'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento_poliza'])) : ''; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Controles de paginación (abajo) para contratos BD -->
+                <div class="pagination-controls">
+                    <div class="records-selector">
+                        <label for="registros_bd2">Mostrar:</label>
+                        <select id="registros_bd2" onchange="cambiarRegistrosBD(this.value)">
+                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
+                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
+                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="pagination-info">
+                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_contratos_bd); ?> de <?php echo $total_contratos_bd; ?> contratos
+                    </div>
+                    
+                    <div class="pagination">
+                        <?php if ($pagina_actual > 1): ?>
+                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
+                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
+                        <?php else: ?>
+                            <span class="disabled">« Primera</span>
+                            <span class="disabled">‹ Anterior</span>
+                        <?php endif; ?>
+                        
+                        <?php
+                        $inicio_paginas = max(1, $pagina_actual - 2);
+                        $fin_paginas = min($total_paginas_bd, $pagina_actual + 2);
+                        
+                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
+                        ?>
+                            <?php if ($i == $pagina_actual): ?>
+                                <span class="current"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+                        
+                        <?php if ($pagina_actual < $total_paginas_bd): ?>
+                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
+                            <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
+                        <?php else: ?>
+                            <span class="disabled">Siguiente ›</span>
+                            <span class="disabled">Última »</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
             </div>
         
         <script>
@@ -516,7 +774,16 @@ if (!empty($excel_data)) {
                 window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
             }
             
-            // Sincronizar ambos selectores
+            function cambiarRegistrosBD(valor) {
+                // Obtener la página actual de la URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const paginaActual = urlParams.get('pagina') || 1;
+                
+                // Redirigir con los nuevos parámetros
+                window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+            }
+            
+            // Sincronizar selectores de datos CSV
             document.addEventListener('DOMContentLoaded', function() {
                 const selector1 = document.getElementById('registros');
                 const selector2 = document.getElementById('registros2');
@@ -528,6 +795,20 @@ if (!empty($excel_data)) {
                     
                     selector2.addEventListener('change', function() {
                         selector1.value = this.value;
+                    });
+                }
+                
+                // Sincronizar selectores de contratos BD
+                const selectorBD1 = document.getElementById('registros_bd');
+                const selectorBD2 = document.getElementById('registros_bd2');
+                
+                if (selectorBD1 && selectorBD2) {
+                    selectorBD1.addEventListener('change', function() {
+                        selectorBD2.value = this.value;
+                    });
+                    
+                    selectorBD2.addEventListener('change', function() {
+                        selectorBD1.value = this.value;
                     });
                 }
             });

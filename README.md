@@ -63,7 +63,7 @@ Contratos/
 │   └── functions.php     # Funciones auxiliares
 ├── index.php             # Página de login
 ├── register.php          # Página de registro
-├── dashboard.php         # Dashboard de usuarios
+
 ├── ejemplo-contratos.csv # Archivo de ejemplo
 ├── logout.php           # Cerrar sesión
 └── README.md            # Este archivo

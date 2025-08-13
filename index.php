@@ -3,11 +3,7 @@ require_once 'includes/functions.php';
 
 // Si ya está logueado, redirigir al dashboard
 if (isLoggedIn()) {
-    if (isAdmin()) {
-        redirect('admin/home.php');
-    } else {
-        redirect('dashboard.php');
-    }
+    redirect('admin/home.php');
 }
 
 $error = '';
@@ -32,11 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['rol'];
                 
-                if ($user['rol'] === 'admin') {
-                    redirect('admin/home.php');
-                } else {
-                    redirect('dashboard.php');
-                }
+                redirect('admin/home.php');
             } else {
                 $error = 'Email o contraseña incorrectos.';
             }

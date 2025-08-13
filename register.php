@@ -3,11 +3,7 @@ require_once 'includes/functions.php';
 
 // Si ya está logueado, redirigir al dashboard
 if (isLoggedIn()) {
-    if (isAdmin()) {
-        redirect('admin/home.php');
-    } else {
-        redirect('dashboard.php');
-    }
+    redirect('admin/home.php');
 }
 
 $error = '';
