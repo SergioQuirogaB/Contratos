@@ -203,6 +203,13 @@ try {
                 <p class="action-description">Ver mis estadísticas personales.</p>
                 <a href="estadisticas.php" class="action-btn">Ver</a>
             </div>
+            
+            <div class="action-card">
+                <div class="action-icon">⚠️</div>
+                <h3 class="action-title">Próximos a Vencer</h3>
+                <p class="action-description">Contratos con vencimiento próximo (60 días).</p>
+                <a href="proximos-vencer.php" class="action-btn">Ver Alertas</a>
+            </div>
         </div>
     </div>
 </body>

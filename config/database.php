@@ -1,8 +1,8 @@
 <?php
 // Configuración de la base de datos
 $host = 'localhost';
-$port = '3307';
-$dbname = 'contratos_db';
+$port = '3309';
+$dbname = 'kontratos';
 $username = 'root';
 $password = '';
 
