@@ -10,9 +10,10 @@ $error = '';
 $success = '';
 $excel_data = [];
 
-// Configuración de paginación
+// Configuración de paginación y filtros
 $registros_por_pagina = isset($_GET['registros']) ? (int)$_GET['registros'] : 25;
 $pagina_actual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$filtro_cliente = isset($_GET['cliente']) ? trim($_GET['cliente']) : '';
 
 // Validar valores de paginación
 if (!in_array($registros_por_pagina, [25, 50, 100])) {
@@ -90,11 +91,15 @@ $inicio = ($pagina_actual - 1) * $registros_por_pagina;
 // Obtener contratos guardados en la base de datos
 $contratos_bd = [];
 $total_contratos_bd = 0;
+$clientes_unicos = [];
 try {
-    $total_contratos_bd = contarContratosUsuario($_SESSION['user_id']);
+    $total_contratos_bd = contarContratosUsuario($_SESSION['user_id'], $filtro_cliente);
     if ($total_contratos_bd > 0) {
-        $contratos_bd = obtenerContratosUsuario($_SESSION['user_id'], $registros_por_pagina, $inicio);
+        $contratos_bd = obtenerContratosUsuario($_SESSION['user_id'], $registros_por_pagina, $inicio, $filtro_cliente);
     }
+    
+    // Obtener lista de clientes únicos para el filtro
+    $clientes_unicos = obtenerClientesUnicos($_SESSION['user_id']);
 } catch (Exception $e) {
     $error = 'Error al obtener contratos de la base de datos: ' . $e->getMessage();
 }
@@ -169,20 +174,64 @@ if (!empty($excel_data)) {
                 <span class="block sm:inline"><?php echo htmlspecialchars($success); ?></span>
             </div>
         <?php endif; ?>
+        
+        <!-- Mensajes de sesión -->
+        <?php if (isset($_SESSION['error_message'])): ?>
+            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?php echo htmlspecialchars($_SESSION['error_message']); ?></span>
+            </div>
+            <?php unset($_SESSION['error_message']); ?>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['success_message'])): ?>
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?php echo htmlspecialchars($_SESSION['success_message']); ?></span>
+            </div>
+            <?php unset($_SESSION['success_message']); ?>
+        <?php endif; ?>
 
         <!-- Sección de Subida de Archivos -->
         <div class="bg-white shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        <i class="fas fa-upload text-blue-500 mr-2"></i>
-                        Contratos
-                    </h3>
-                    <a href="nuevo-contrato.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                        <i class="fas fa-plus mr-2"></i>
-                        Crear Nuevo Contrato
-                    </a>
-                </div>
+                                 <div class="flex justify-between items-center mb-6">
+                     <div class="flex items-center space-x-4">
+                         <h3 class="text-lg leading-6 font-medium text-gray-900">
+                             <i class="fas fa-upload text-blue-500 mr-2"></i>
+                             Contratos
+                         </h3>
+                         
+                         <!-- Filtro por cliente -->
+                         <div class="flex items-center space-x-2">
+                             <label for="filtro_cliente_header" class="text-sm font-medium text-gray-700">Filtrar por Cliente:</label>
+                             <select id="filtro_cliente_header" onchange="aplicarFiltro()" class="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                 <option value="">Todos los clientes</option>
+                                 <?php foreach ($clientes_unicos as $cliente): ?>
+                                     <option value="<?php echo htmlspecialchars($cliente); ?>" <?php echo $filtro_cliente === $cliente ? 'selected' : ''; ?>>
+                                         <?php echo htmlspecialchars($cliente); ?>
+                                     </option>
+                                 <?php endforeach; ?>
+                             </select>
+                             
+                             <?php if (!empty($filtro_cliente)): ?>
+                                 <div class="flex items-center space-x-2">
+                                     <span class="text-sm text-blue-700">
+                                         <i class="fas fa-filter mr-1"></i>
+                                         Filtrado por: <strong><?php echo htmlspecialchars($filtro_cliente); ?></strong>
+                                     </span>
+                                     <a href="?registros=<?php echo $registros_por_pagina; ?>" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200">
+                                         <i class="fas fa-times mr-1"></i>
+                                         Limpiar
+                                     </a>
+                                 </div>
+                             <?php endif; ?>
+                         </div>
+                     </div>
+                     
+                     <a href="nuevo-contrato.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                         <i class="fas fa-plus mr-2"></i>
+                         Crear Nuevo Contrato
+                     </a>
+                 </div>
                 
                 <!-- Instrucciones -->
                 <!-- <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
@@ -410,6 +459,14 @@ if (!empty($excel_data)) {
                         </div>
                     </div> -->
                     
+                                         <!-- Información de ordenamiento -->
+                     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                         <div class="flex items-center text-sm text-blue-700">
+                             <i class="fas fa-info-circle mr-2"></i>
+                             <span>Los contratos están ordenados por <strong>año descendente</strong> (más actual al más antiguo)</span>
+                         </div>
+                     </div>
+                    
                     <!-- Controles de paginación para contratos BD -->
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
                         <div class="flex items-center space-x-2">
@@ -427,11 +484,19 @@ if (!empty($excel_data)) {
                         
                         <!-- Paginación para contratos BD -->
                         <div class="flex space-x-1">
+                            <?php 
+                            // Construir parámetros de URL para mantener el filtro
+                            $parametros_url = "registros=" . $registros_por_pagina;
+                            if (!empty($filtro_cliente)) {
+                                $parametros_url .= "&cliente=" . urlencode($filtro_cliente);
+                            }
+                            ?>
+                            
                             <?php if ($pagina_actual > 1): ?>
-                                <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a href="?pagina=1&<?php echo $parametros_url; ?>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <i class="fas fa-angle-double-left"></i>
                                 </a>
-                                <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a href="?pagina=<?php echo $pagina_actual - 1; ?>&<?php echo $parametros_url; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <i class="fas fa-angle-left"></i>
                                 </a>
                             <?php else: ?>
@@ -454,17 +519,17 @@ if (!empty($excel_data)) {
                                         <?php echo $i; ?>
                                     </span>
                                 <?php else: ?>
-                                    <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    <a href="?pagina=<?php echo $i; ?>&<?php echo $parametros_url; ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                                         <?php echo $i; ?>
                                     </a>
                                 <?php endif; ?>
                             <?php endfor; ?>
                             
                             <?php if ($pagina_actual < $total_paginas_bd): ?>
-                                <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a href="?pagina=<?php echo $pagina_actual + 1; ?>&<?php echo $parametros_url; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <i class="fas fa-angle-right"></i>
                                 </a>
-                                <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a href="?pagina=<?php echo $total_paginas_bd; ?>&<?php echo $parametros_url; ?>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <i class="fas fa-angle-double-right"></i>
                                 </a>
                             <?php else: ?>
@@ -483,7 +548,9 @@ if (!empty($excel_data)) {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AÑO</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <i class="fas fa-sort-numeric-down mr-1"></i>AÑO
+                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CLIENTE</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No contrato</th>
@@ -503,6 +570,7 @@ if (!empty($excel_data)) {
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura No</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No de Póliza</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Vencimiento Póliza</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -528,6 +596,18 @@ if (!empty($excel_data)) {
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['factura_no'] ?? ''); ?></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['no_poliza'] ?? ''); ?></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['fecha_vencimiento_poliza'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento_poliza'])) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <div class="flex space-x-2">
+                                                <a href="editar-contrato.php?id=<?php echo $contrato['id']; ?>" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                    <i class="fas fa-edit mr-1"></i>
+                                                    Editar
+                                                </a>
+                                                <button onclick="eliminarContrato(<?php echo $contrato['id']; ?>, '<?php echo htmlspecialchars($contrato['no_contrato'] ?? 'este contrato'); ?>')" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                    <i class="fas fa-trash mr-1"></i>
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -540,22 +620,51 @@ if (!empty($excel_data)) {
 
     <script>
         function cambiarRegistros(valor) {
-            // Obtener la página actual de la URL
+            // Obtener parámetros actuales de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const paginaActual = urlParams.get('pagina') || 1;
+            const clienteFiltro = urlParams.get('cliente') || '';
+            
+            // Construir nueva URL
+            let nuevaUrl = `?pagina=${paginaActual}&registros=${valor}`;
+            if (clienteFiltro) {
+                nuevaUrl += `&cliente=${encodeURIComponent(clienteFiltro)}`;
+            }
             
             // Redirigir con los nuevos parámetros
-            window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+            window.location.href = nuevaUrl;
         }
         
         function cambiarRegistrosBD(valor) {
-            // Obtener la página actual de la URL
+            // Obtener parámetros actuales de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const paginaActual = urlParams.get('pagina') || 1;
+            const clienteFiltro = urlParams.get('cliente') || '';
+            
+            // Construir nueva URL
+            let nuevaUrl = `?pagina=${paginaActual}&registros=${valor}`;
+            if (clienteFiltro) {
+                nuevaUrl += `&cliente=${encodeURIComponent(clienteFiltro)}`;
+            }
             
             // Redirigir con los nuevos parámetros
-            window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+            window.location.href = nuevaUrl;
         }
+        
+                 function aplicarFiltro() {
+             const filtroCliente = document.getElementById('filtro_cliente_header').value;
+             const urlParams = new URLSearchParams(window.location.search);
+             const registrosActual = urlParams.get('registros') || 25;
+             
+             // Construir nueva URL
+             let nuevaUrl = `?pagina=1&registros=${registrosActual}`;
+             if (filtroCliente) {
+                 nuevaUrl += `&cliente=${encodeURIComponent(filtroCliente)}`;
+             }
+             
+             // Redirigir con el filtro aplicado
+             window.location.href = nuevaUrl;
+         }
         
         // Sincronizar selectores de datos CSV
         document.addEventListener('DOMContentLoaded', function() {
@@ -586,6 +695,25 @@ if (!empty($excel_data)) {
                 });
             }
         });
+        
+        // Función para eliminar contrato
+        function eliminarContrato(contratoId, nombreContrato) {
+            if (confirm('¿Estás seguro de que quieres eliminar el contrato "' + nombreContrato + '"? Esta acción no se puede deshacer.')) {
+                // Crear formulario temporal para enviar la solicitud de eliminación
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'eliminar-contrato.php';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'contrato_id';
+                input.value = contratoId;
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
     </script>
 </body>
 </html>

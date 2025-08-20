@@ -41,7 +41,7 @@ try {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen">
+ <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,7 +56,9 @@ try {
                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                             <i class="fas fa-user text-blue-600 text-sm"></i>
                         </div>
-                        <span class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                        <a href="perfil.php" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                            <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                        </a>
                         <?php if (isAdmin()): ?>
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                 Administrador
@@ -72,8 +74,8 @@ try {
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+         <!-- Main Content -->
+     <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex-1">
     <!-- Quick Actions -->
         <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
@@ -115,23 +117,7 @@ try {
                         </div>
                     </div>
 
-                    <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-user-cog text-purple-600"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <a href="perfil.php" class="focus:outline-none">
-                                <span class="absolute inset-0" aria-hidden="true"></span>
-                                <p class="text-sm font-medium text-gray-900">Mi Perfil</p>
-                                <p class="text-sm text-gray-500 truncate">Configurar cuenta</p>
-                            </a>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                        </div>
-                    </div>
+
 
                     <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                         <div class="flex-shrink-0">
@@ -172,34 +158,35 @@ try {
             </div>
         </div>
 
-        <!-- Additional Info Section -->
-        <div class="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                        Información del Sistema
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Versión:</span>
-                            <span class="text-sm font-medium text-gray-900">1.0.0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Estado del Sistema:</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
-                                Operativo
-                            </span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600">Última actualización:</span>
-                            <span class="text-sm font-medium text-gray-900"><?php echo date('d/m/Y'); ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-</body>
-</html>
+             </main>
+
+           <!-- Footer -->
+      <footer class="bg-white border-t border-gray-200 mt-auto">
+         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                 <div class="flex items-center space-x-6 text-sm text-gray-600">
+                     <div class="flex items-center space-x-2">
+                         <span>Versión:</span>
+                         <span class="font-medium text-gray-900">1.0.0</span>
+                     </div>
+                     <div class="flex items-center space-x-2">
+                         <span>Estado:</span>
+                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                             <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
+                             Operativo
+                         </span>
+                     </div>
+                     <div class="flex items-center space-x-2">
+                         <span>Actualizado:</span>
+                         <span class="font-medium text-gray-900"><?php echo date('d/m/Y'); ?></span>
+                     </div>
+                 </div>
+                 <div class="text-sm text-gray-500">
+                     <i class="fas fa-copyright mr-1"></i>
+                     Sistema de Gestión Contractual
+                 </div>
+             </div>
+         </div>
+     </footer>
+ </body>
+ </html>

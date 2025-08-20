@@ -124,10 +124,20 @@ function convertirFecha($fecha) {
 }
 
 // Función para obtener contratos del usuario
-function obtenerContratosUsuario($usuario_id, $limit = null, $offset = null) {
+function obtenerContratosUsuario($usuario_id, $limit = null, $offset = null, $filtro_cliente = null) {
     global $pdo;
     
-    $sql = "SELECT * FROM contratos WHERE usuario_id = :usuario_id ORDER BY fecha_creacion DESC";
+    $sql = "SELECT * FROM contratos WHERE usuario_id = :usuario_id";
+    $params = [':usuario_id' => $usuario_id];
+    
+    // Agregar filtro por cliente si se especifica
+    if (!empty($filtro_cliente)) {
+        $sql .= " AND cliente LIKE :cliente";
+        $params[':cliente'] = '%' . $filtro_cliente . '%';
+    }
+    
+    // Ordenar por año descendente (más actual al más antiguo)
+    $sql .= " ORDER BY ano DESC, fecha_creacion DESC";
     
     if ($limit !== null) {
         $sql .= " LIMIT :limit";
@@ -137,7 +147,11 @@ function obtenerContratosUsuario($usuario_id, $limit = null, $offset = null) {
     }
     
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
+    
+    // Bind de parámetros
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
     
     if ($limit !== null) {
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
@@ -151,15 +165,144 @@ function obtenerContratosUsuario($usuario_id, $limit = null, $offset = null) {
 }
 
 // Función para contar contratos del usuario
-function contarContratosUsuario($usuario_id) {
+function contarContratosUsuario($usuario_id, $filtro_cliente = null) {
     global $pdo;
     
     $sql = "SELECT COUNT(*) as total FROM contratos WHERE usuario_id = :usuario_id";
+    $params = [':usuario_id' => $usuario_id];
+    
+    // Agregar filtro por cliente si se especifica
+    if (!empty($filtro_cliente)) {
+        $sql .= " AND cliente LIKE :cliente";
+        $params[':cliente'] = '%' . $filtro_cliente . '%';
+    }
+    
     $stmt = $pdo->prepare($sql);
+    
+    // Bind de parámetros
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    
+    $stmt->execute();
+    $resultado = $stmt->fetch();
+    return $resultado['total'];
+}
+
+// Función para obtener un contrato específico por ID
+function obtenerContratoPorId($contrato_id, $usuario_id) {
+    global $pdo;
+    
+    $sql = "SELECT * FROM contratos WHERE id = :contrato_id AND usuario_id = :usuario_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':contrato_id', $contrato_id, PDO::PARAM_INT);
     $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
     $stmt->execute();
     
-    $resultado = $stmt->fetch();
-    return $resultado['total'];
+    return $stmt->fetch();
+}
+
+// Función para actualizar un contrato
+function actualizarContrato($contrato_id, $usuario_id, $datos) {
+    global $pdo;
+    
+    try {
+        $sql = "UPDATE contratos SET 
+            ano = :ano,
+            empresa = :empresa,
+            cliente = :cliente,
+            no_contrato = :no_contrato,
+            valor_pesos_sin_iva = :valor_pesos_sin_iva,
+            valor_dolares = :valor_dolares,
+            descripcion = :descripcion,
+            categoria = :categoria,
+            valor_mensual = :valor_mensual,
+            observaciones = :observaciones,
+            fecha_inicio = :fecha_inicio,
+            fecha_vencimiento = :fecha_vencimiento,
+            valor_facturado = :valor_facturado,
+            porcentaje_ejecucion = :porcentaje_ejecucion,
+            valor_pendiente_ejecutar = :valor_pendiente_ejecutar,
+            estado = :estado,
+            no_horas = :no_horas,
+            factura_no = :factura_no,
+            no_poliza = :no_poliza,
+            fecha_vencimiento_poliza = :fecha_vencimiento_poliza,
+            fecha_actualizacion = NOW()
+            WHERE id = :contrato_id AND usuario_id = :usuario_id";
+        
+        $stmt = $pdo->prepare($sql);
+        
+        $params = [
+            ':ano' => !empty($datos['ano']) ? (int)$datos['ano'] : null,
+            ':empresa' => !empty($datos['empresa']) ? cleanInput($datos['empresa']) : null,
+            ':cliente' => !empty($datos['cliente']) ? cleanInput($datos['cliente']) : null,
+            ':no_contrato' => !empty($datos['no_contrato']) ? cleanInput($datos['no_contrato']) : null,
+            ':valor_pesos_sin_iva' => !empty($datos['valor_pesos_sin_iva']) ? (float)str_replace(['$', ',', ' '], '', $datos['valor_pesos_sin_iva']) : null,
+            ':valor_dolares' => !empty($datos['valor_dolares']) ? (float)str_replace(['$', ',', ' '], '', $datos['valor_dolares']) : null,
+            ':descripcion' => !empty($datos['descripcion']) ? cleanInput($datos['descripcion']) : null,
+            ':categoria' => !empty($datos['categoria']) ? cleanInput($datos['categoria']) : null,
+            ':valor_mensual' => !empty($datos['valor_mensual']) ? (float)str_replace(['$', ',', ' '], '', $datos['valor_mensual']) : null,
+            ':observaciones' => !empty($datos['observaciones']) ? cleanInput($datos['observaciones']) : null,
+            ':fecha_inicio' => !empty($datos['fecha_inicio']) ? convertirFecha($datos['fecha_inicio']) : null,
+            ':fecha_vencimiento' => !empty($datos['fecha_vencimiento']) ? convertirFecha($datos['fecha_vencimiento']) : null,
+            ':valor_facturado' => !empty($datos['valor_facturado']) ? (float)str_replace(['$', ',', ' '], '', $datos['valor_facturado']) : null,
+            ':porcentaje_ejecucion' => !empty($datos['porcentaje_ejecucion']) ? (float)str_replace(['%', ' '], '', $datos['porcentaje_ejecucion']) : null,
+            ':valor_pendiente_ejecutar' => !empty($datos['valor_pendiente_ejecutar']) ? (float)str_replace(['$', ',', ' '], '', $datos['valor_pendiente_ejecutar']) : null,
+            ':estado' => !empty($datos['estado']) ? cleanInput($datos['estado']) : null,
+            ':no_horas' => !empty($datos['no_horas']) ? (int)$datos['no_horas'] : null,
+            ':factura_no' => !empty($datos['factura_no']) ? cleanInput($datos['factura_no']) : null,
+            ':no_poliza' => !empty($datos['no_poliza']) ? cleanInput($datos['no_poliza']) : null,
+            ':fecha_vencimiento_poliza' => !empty($datos['fecha_vencimiento_poliza']) ? convertirFecha($datos['fecha_vencimiento_poliza']) : null,
+            ':contrato_id' => $contrato_id,
+            ':usuario_id' => $usuario_id
+        ];
+        
+        $stmt->execute($params);
+        return $stmt->rowCount() > 0;
+        
+    } catch (Exception $e) {
+        throw $e;
+    }
+}
+
+// Función para eliminar un contrato
+function eliminarContrato($contrato_id, $usuario_id) {
+    global $pdo;
+    
+    try {
+        $sql = "DELETE FROM contratos WHERE id = :contrato_id AND usuario_id = :usuario_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':contrato_id', $contrato_id, PDO::PARAM_INT);
+        $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->rowCount() > 0;
+        
+    } catch (Exception $e) {
+        throw $e;
+    }
+}
+
+// Función para obtener lista de clientes únicos
+function obtenerClientesUnicos($usuario_id) {
+    global $pdo;
+    
+    try {
+        $sql = "SELECT DISTINCT cliente FROM contratos WHERE usuario_id = :usuario_id AND cliente IS NOT NULL AND cliente != '' ORDER BY cliente ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $clientes = [];
+        while ($row = $stmt->fetch()) {
+            $clientes[] = $row['cliente'];
+        }
+        
+        return $clientes;
+        
+    } catch (Exception $e) {
+        throw $e;
+    }
 }
 ?>
