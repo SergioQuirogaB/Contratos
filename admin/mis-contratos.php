@@ -199,38 +199,38 @@ if (!empty($excel_data)) {
                              <i class="fas fa-upload text-blue-500 mr-2"></i>
                              Contratos
                          </h3>
-                         
-                         <!-- Filtro por cliente -->
-                         <div class="flex items-center space-x-2">
-                             <label for="filtro_cliente_header" class="text-sm font-medium text-gray-700">Filtrar por Cliente:</label>
-                             <select id="filtro_cliente_header" onchange="aplicarFiltro()" class="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                 <option value="">Todos los clientes</option>
-                                 <?php foreach ($clientes_unicos as $cliente): ?>
-                                     <option value="<?php echo htmlspecialchars($cliente); ?>" <?php echo $filtro_cliente === $cliente ? 'selected' : ''; ?>>
-                                         <?php echo htmlspecialchars($cliente); ?>
-                                     </option>
-                                 <?php endforeach; ?>
-                             </select>
+                     </div>
+                     
+                     <div class="flex items-center space-x-4">
+                         <!-- Filtro por cliente mejorado -->
+                         <div class="relative">
+                             <div class="flex items-center space-x-2 bg-white border border-gray-300 rounded-lg shadow-sm px-3 py-2 hover:border-blue-400 transition-colors duration-200">
+                                 <i class="fas fa-filter text-gray-400 text-sm"></i>
+                                 <select id="filtro_cliente_header" onchange="aplicarFiltro()" class="border-none bg-transparent text-sm text-gray-700 focus:outline-none focus:ring-0 cursor-pointer min-w-[150px]">
+                                     <option value="">Todos los clientes</option>
+                                     <?php foreach ($clientes_unicos as $cliente): ?>
+                                         <option value="<?php echo htmlspecialchars($cliente); ?>" <?php echo $filtro_cliente === $cliente ? 'selected' : ''; ?>>
+                                             <?php echo htmlspecialchars($cliente); ?>
+                                         </option>
+                                     <?php endforeach; ?>
+                                 </select>
+                                 <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                             </div>
                              
                              <?php if (!empty($filtro_cliente)): ?>
-                                 <div class="flex items-center space-x-2">
-                                     <span class="text-sm text-blue-700">
-                                         <i class="fas fa-filter mr-1"></i>
-                                         Filtrado por: <strong><?php echo htmlspecialchars($filtro_cliente); ?></strong>
-                                     </span>
-                                     <a href="?registros=<?php echo $registros_por_pagina; ?>" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200">
-                                         <i class="fas fa-times mr-1"></i>
-                                         Limpiar
+                                 <div class="absolute -top-2 -right-2">
+                                     <a href="?registros=<?php echo $registros_por_pagina; ?>" class="inline-flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs rounded-full hover:bg-red-600 transition-colors duration-200" title="Limpiar filtro">
+                                         <i class="fas fa-times"></i>
                                      </a>
                                  </div>
                              <?php endif; ?>
                          </div>
+                         
+                         <a href="nuevo-contrato.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                             <i class="fas fa-plus mr-2"></i>
+                             Crear Nuevo Contrato
+                         </a>
                      </div>
-                     
-                     <a href="nuevo-contrato.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                         <i class="fas fa-plus mr-2"></i>
-                         Crear Nuevo Contrato
-                     </a>
                  </div>
                 
                 <!-- Instrucciones -->

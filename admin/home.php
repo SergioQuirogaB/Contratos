@@ -41,124 +41,112 @@ try {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
- <body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <h1 class="text-xl font-bold text-gray-900">Sistema de Gestión Contractual</h1>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-user text-blue-600 text-sm"></i>
-                        </div>
-                        <a href="perfil.php" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
-                            <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                        </a>
-                        <?php if (isAdmin()): ?>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Administrador
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                    <a href="../logout.php" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <i class="fas fa-sign-out-alt mr-2"></i>
-                        Cerrar Sesión
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+     <!-- Header -->
+     <header class="bg-white shadow-sm border-b border-gray-200">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="flex justify-between items-center h-16">
+                 <div class="flex items-center">
+                     <div class="flex-shrink-0">
+                                                   <h1 class="text-xl font-bold"><span class="text-blue-800">K</span><span class="text-blue-400">O</span><span class="text-blue-800">NTRATOS</span></h1>
+                     </div>
+                 </div>
+                 <div class="flex items-center space-x-4">
+                     <div class="flex items-center space-x-2">
+                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                             <i class="fas fa-user text-blue-600 text-sm"></i>
+                         </div>
+                         <a href="perfil.php" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                             <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                         </a>
+                         <?php if (isAdmin()): ?>
+                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                 Administrador
+                             </span>
+                         <?php endif; ?>
+                     </div>
+                     <button id="toggle-sidebar" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2">
+                         <i class="fas fa-chevron-right mr-2"></i>
+                         Menú
+                     </button>
+                     <a href="../logout.php" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                         <i class="fas fa-sign-out-alt mr-2"></i>
+                         Cerrar Sesión
+                     </a>
+                 </div>
+             </div>
+         </div>
+     </header>
+
+     <!-- Main Layout with Sidebar -->
+     <div class="flex flex-1">
+         <!-- Sidebar -->
+         <aside id="sidebar" class="w-0 overflow-hidden bg-white shadow-lg transition-all duration-300 ease-in-out">
+             <div class="p-6">
+                 <nav class="space-y-2">
+                     <a href="mis-contratos.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 group">
+                         <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200">
+                             <i class="fas fa-file-contract text-blue-600 text-sm"></i>
+                         </div>
+                         <div>
+                             <p class="font-medium">Mis Contratos</p>
+                         </div>
+                     </a>
+
+                     <a href="nuevo-contrato.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-700 transition-colors duration-200 group">
+                         <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200">
+                             <i class="fas fa-plus-circle text-green-600 text-sm"></i>
+                         </div>
+                         <div>
+                             <p class="font-medium">Nuevo Contrato</p>
+                         </div>
+                     </a>
+
+                     <a href="estadisticas.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 group">
+                         <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-indigo-200">
+                             <i class="fas fa-chart-bar text-indigo-600 text-sm"></i>
+                         </div>
+                         <div>
+                             <p class="font-medium">Reportes</p>
+                         </div>
+                     </a>
+
+                     <a href="proximos-vencer.php" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-yellow-50 hover:text-yellow-700 transition-colors duration-200 group">
+                         <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-yellow-200">
+                             <i class="fas fa-exclamation-triangle text-yellow-600 text-sm"></i>
+                         </div>
+                         <div>
+                             <p class="font-medium">Alertas</p>
+                         </div>
+                     </a>
+                 </nav>
+             </div>
+         </aside>
 
          <!-- Main Content -->
-     <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex-1">
-    <!-- Quick Actions -->
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">Acciones Rápidas</h3>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-file-contract text-blue-600"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <a href="mis-contratos.php" class="focus:outline-none">
-                                <span class="absolute inset-0" aria-hidden="true"></span>
-                                <p class="text-sm font-medium text-gray-900">Mis Contratos</p>
-                                <p class="text-sm text-gray-500 truncate">Ver y gestionar contratos</p>
-                            </a>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                        </div>
-                    </div>
-
-                    <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-plus-circle text-green-600"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <a href="nuevo-contrato.php" class="focus:outline-none">
-                                <span class="absolute inset-0" aria-hidden="true"></span>
-                                <p class="text-sm font-medium text-gray-900">Nuevo Contrato</p>
-                                <p class="text-sm text-gray-500 truncate">Crear contrato nuevo</p>
-                            </a>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                        </div>
-                    </div>
-
-
-
-                    <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-chart-bar text-indigo-600"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <a href="estadisticas.php" class="focus:outline-none">
-                                <span class="absolute inset-0" aria-hidden="true"></span>
-                                <p class="text-sm font-medium text-gray-900">Reportes</p>
-                                <p class="text-sm text-gray-500 truncate">Estadísticas y análisis</p>
-                            </a>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                        </div>
-                    </div>
-
-                    <div class="relative rounded-lg border border-yellow-300 bg-yellow-50 px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-yellow-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-yellow-500">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-exclamation-triangle text-yellow-600"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <a href="proximos-vencer.php" class="focus:outline-none">
-                                <span class="absolute inset-0" aria-hidden="true"></span>
-                                <p class="text-sm font-medium text-gray-900">Alertas</p>
-                                <p class="text-sm text-gray-500 truncate">Próximos a vencer</p>
-                            </a>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-arrow-right text-gray-400"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-             </main>
+         <main id="main-content" class="flex-1 p-8 transition-all duration-300 ease-in-out">
+             <div class="max-w-4xl mx-auto">
+                 <div class="bg-white shadow rounded-lg p-8">
+                     <h2 class="text-2xl font-bold text-gray-900 mb-6">Bienvenido al Sistema</h2>
+                     <p class="text-gray-600 mb-6">
+                         Gestiona tus contratos de manera eficiente. Utiliza el menú lateral para acceder a todas las funcionalidades del sistema.
+                     </p>
+                     
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                             <h3 class="text-lg font-semibold text-blue-900 mb-2">Contratos</h3>
+                             <p class="text-blue-700 text-sm">Accede a todos tus contratos, créalos, edítalos y mantén un control completo.</p>
+                         </div>
+                         
+                         <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                             <h3 class="text-lg font-semibold text-green-900 mb-2">Reportes</h3>
+                             <p class="text-green-700 text-sm">Visualiza estadísticas y análisis detallados de tu cartera de contratos.</p>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </main>
+     </div>
 
            <!-- Footer -->
       <footer class="bg-white border-t border-gray-200 mt-auto">
@@ -178,15 +166,64 @@ try {
                      </div>
                      <div class="flex items-center space-x-2">
                          <span>Actualizado:</span>
-                         <span class="font-medium text-gray-900"><?php echo date('d/m/Y'); ?></span>
+                         <span class="font-medium text-gray-900">20/08/2025</span>
                      </div>
                  </div>
                  <div class="text-sm text-gray-500">
                      <i class="fas fa-copyright mr-1"></i>
-                     Sistema de Gestión Contractual
+                     KONTRATOS
                  </div>
              </div>
          </div>
-     </footer>
- </body>
- </html>
+           </footer>
+
+             <script>
+           // Función para alternar el sidebar
+           function toggleSidebar() {
+               const sidebar = document.getElementById('sidebar');
+               const mainContent = document.getElementById('main-content');
+               const toggleButton = document.getElementById('toggle-sidebar');
+               const icon = toggleButton.querySelector('i');
+               
+               if (sidebar.classList.contains('w-64')) {
+                   // Cerrar sidebar
+                   sidebar.classList.remove('w-64');
+                   sidebar.classList.add('w-0', 'overflow-hidden');
+                   mainContent.classList.add('ml-0');
+                   icon.classList.remove('fa-bars');
+                   icon.classList.add('fa-chevron-right');
+                   toggleButton.innerHTML = '<i class="fas fa-chevron-right mr-2"></i>Menú';
+               } else {
+                   // Abrir sidebar
+                   sidebar.classList.remove('w-0', 'overflow-hidden');
+                   sidebar.classList.add('w-64');
+                   mainContent.classList.remove('ml-0');
+                   icon.classList.remove('fa-chevron-right');
+                   icon.classList.add('fa-bars');
+                   toggleButton.innerHTML = '<i class="fas fa-bars mr-2"></i>Menú';
+               }
+           }
+           
+           // Event listener para el botón de toggle
+           document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+           
+           // Función para inicializar el sidebar cerrado
+           function initializeSidebar() {
+               const sidebar = document.getElementById('sidebar');
+               const mainContent = document.getElementById('main-content');
+               const toggleButton = document.getElementById('toggle-sidebar');
+               
+               // Siempre iniciar con el sidebar cerrado
+               sidebar.classList.remove('w-64');
+               sidebar.classList.add('w-0', 'overflow-hidden');
+               mainContent.classList.add('ml-0');
+               
+               // Configurar el botón para mostrar que está cerrado
+               toggleButton.innerHTML = '<i class="fas fa-chevron-right mr-2"></i>Menú';
+           }
+           
+           // Ejecutar al cargar la página
+           window.addEventListener('load', initializeSidebar);
+       </script>
+  </body>
+  </html>
