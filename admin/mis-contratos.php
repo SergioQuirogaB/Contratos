@@ -116,702 +116,476 @@ if (!empty($excel_data)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Contratos - Sistema de Contratos</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .page-container {
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .content-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f8f9fa;
-        }
-        
-        .upload-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .upload-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.3s ease;
-        }
-        
-        .file-input:hover {
-            border-color: #764ba2;
-        }
-        
-        .upload-btn {
-            margin-top: 15px;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .upload-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .excel-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .excel-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .excel-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .excel-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .back-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-        
-        .back-btn:hover {
-            background: #5a6268;
-        }
-        
-        .instructions {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        
-        .instructions h4 {
-            margin: 0 0 10px 0;
-            color: #1976d2;
-        }
-        
-        .instructions ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin-bottom: 5px;
-        }
-        
-        .pagination-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .records-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .records-selector label {
-            font-weight: 500;
-            color: #555;
-        }
-        
-        .records-selector select {
-            padding: 8px 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            cursor: pointer;
-        }
-        
-        .records-selector select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .pagination-info {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .pagination {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        
-        .pagination a,
-        .pagination span {
-            padding: 8px 12px;
-            border: 1px solid #e1e5e9;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #667eea;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        
-        .pagination a:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .pagination .current {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .pagination .disabled {
-            color: #ccc;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        
-        .data-summary {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        
-        .data-summary h4 {
-            margin: 0 0 10px 0;
-            color: #1976d2;
-        }
-        
-        .data-summary p {
-            margin: 5px 0;
-            color: #333;
-        }
-        
-        .save-section {
-            background: #e8f5e8;
-            border-left: 4px solid #4caf50;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .save-btn {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .save-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
-        }
-        
-        .save-info {
-            color: #2e7d32;
-            font-size: 14px;
-            font-style: italic;
-        }
-        
-        .new-contract-btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s ease;
-        }
-        
-        .new-contract-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
-            color: white;
-            text-decoration: none;
-        }
-    </style>
+    <title>Mis Contratos - Sistema de Gestión Contractual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="page-container">
-    <div class="content-container">
-        <div class="page-header">
-            <h1 class="admin-title">Mis Contratos</h1>
-            <div class="user-info">
-                <span class="user-name">Hola, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                <a href="home.php" class="back-btn">← Volver al Dashboard</a>
-                <a href="../logout.php" class="logout-btn">Cerrar Sesión</a>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900">Mis Contratos</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600 text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                        <?php if (isAdmin()): ?>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                Administrador
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                    <a href="home.php" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver al Dashboard
+                    </a>
+                    <a href="../logout.php" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Cerrar Sesión
+                    </a>
+                </div>
             </div>
         </div>
-        
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Alertas -->
         <?php if ($error): ?>
-            <?php echo showError($error); ?>
+            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?php echo htmlspecialchars($error); ?></span>
+            </div>
         <?php endif; ?>
         
         <?php if ($success): ?>
-            <?php echo showSuccess($success); ?>
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?php echo htmlspecialchars($success); ?></span>
+            </div>
         <?php endif; ?>
-        
-        <div class="upload-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 class="upload-title">📊 Subir Archivo de Contratos</h2>
-                <a href="nuevo-contrato.php" class="new-contract-btn">➕ Crear Nuevo Contrato</a>
-            </div>
-            
-            <div class="instructions">
-                <h4>📋 Instrucciones:</h4>
-                <ul>
-                    <li>Sube un archivo CSV con los datos de tus contratos</li>
-                    <li>La primera fila debe contener los nombres de las columnas</li>
-                    <li>Los datos deben estar separados por comas</li>
-                    <li>Puedes exportar desde Excel como CSV</li>
-                </ul>
-            </div>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <div class="file-input-wrapper">
-                    <input type="file" name="excel_file" class="file-input" accept=".csv,.txt" required>
+
+        <!-- Sección de Subida de Archivos -->
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-upload text-blue-500 mr-2"></i>
+                        Contratos
+                    </h3>
+                    <a href="nuevo-contrato.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-plus mr-2"></i>
+                        Crear Nuevo Contrato
+                    </a>
                 </div>
-                <button type="submit" name="upload_excel" class="upload-btn">📤 Subir y Procesar</button>
-            </form>
+                
+                <!-- Instrucciones -->
+                <!-- <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-blue-800">Instrucciones:</h4>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Sube un archivo CSV con los datos de tus contratos</li>
+                                    <li>La primera fila debe contener los nombres de las columnas</li>
+                                    <li>Los datos deben estar separados por comas</li>
+                                    <li>Puedes exportar desde Excel como CSV</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                
+                <!-- Formulario de subida -->
+                <!-- <form method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label for="excel_file" class="block text-sm font-medium text-gray-700 mb-2">
+                            Seleccionar archivo CSV
+                        </label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="excel_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        <span>Subir archivo</span>
+                                        <input id="excel_file" name="excel_file" type="file" class="sr-only" accept=".csv,.txt" required>
+                                    </label>
+                                    <p class="pl-1">o arrastrar y soltar</p>
+                                </div>
+                                <p class="text-xs text-gray-500">CSV, TXT hasta 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" name="upload_excel" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-upload mr-2"></i>
+                        Subir y Procesar
+                    </button>
+                </form> -->
+            </div>
         </div>
-        
+
+        <!-- Sección de Datos CSV -->
         <?php if (!empty($excel_data)): ?>
-            <div class="excel-section">
-                <h2 class="upload-title">📋 Datos de Contratos</h2>
-                
-                <div class="save-section">
-                    <form method="POST" style="display: inline;">
-                        <button type="submit" name="guardar_bd" class="save-btn" onclick="return confirm('¿Estás seguro de que quieres guardar estos contratos en la base de datos?')">
-                            💾 Guardar en Base de Datos
-                        </button>
-                    </form>
-                    <span class="save-info">Los datos se guardarán permanentemente en la base de datos</span>
-                </div>
-                
-                <div class="data-summary">
-                    <h4>📊 Resumen de Datos</h4>
-                    <p><strong>Total de registros:</strong> <?php echo $total_registros; ?></p>
-                    <p><strong>Registros por página:</strong> <?php echo $registros_por_pagina; ?></p>
-                    <p><strong>Página actual:</strong> <?php echo $pagina_actual; ?> de <?php echo $total_paginas; ?></p>
-                </div>
-                
-                <!-- Controles de paginación -->
-                <div class="pagination-controls">
-                    <div class="records-selector">
-                        <label for="registros">Mostrar:</label>
-                        <select id="registros" onchange="cambiarRegistros(this.value)">
-                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
-                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
-                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
-                        </select>
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">
+                        <i class="fas fa-table text-green-500 mr-2"></i>
+                        Datos de Contratos
+                    </h3>
+                    
+                    <!-- Botón de guardar -->
+                    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-save text-green-400"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <form method="POST" class="inline">
+                                    <button type="submit" name="guardar_bd" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" onclick="return confirm('¿Estás seguro de que quieres guardar estos contratos en la base de datos?')">
+                                        <i class="fas fa-database mr-2"></i>
+                                        Guardar en Base de Datos
+                                    </button>
+                                </form>
+                                <p class="mt-1 text-sm text-green-700">Los datos se guardarán permanentemente en la base de datos</p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="pagination-info">
-                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_registros); ?> de <?php echo $total_registros; ?> registros
+                    <!-- Resumen de datos -->
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-bar text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-blue-800">Resumen de Datos</h4>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <p><strong>Total de registros:</strong> <?php echo $total_registros; ?></p>
+                                    <p><strong>Registros por página:</strong> <?php echo $registros_por_pagina; ?></p>
+                                    <p><strong>Página actual:</strong> <?php echo $pagina_actual; ?> de <?php echo $total_paginas; ?></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="pagination">
-                        <?php if ($pagina_actual > 1): ?>
-                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
-                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
-                        <?php else: ?>
-                            <span class="disabled">« Primera</span>
-                            <span class="disabled">‹ Anterior</span>
-                        <?php endif; ?>
+                    <!-- Controles de paginación -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+                        <div class="flex items-center space-x-2">
+                            <label for="registros" class="text-sm font-medium text-gray-700">Mostrar:</label>
+                            <select id="registros" onchange="cambiarRegistros(this.value)" class="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
+                                <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
+                                <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
+                            </select>
+                        </div>
                         
-                        <?php
-                        $inicio_paginas = max(1, $pagina_actual - 2);
-                        $fin_paginas = min($total_paginas, $pagina_actual + 2);
+                        <div class="text-sm text-gray-700">
+                            Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_registros); ?> de <?php echo $total_registros; ?> registros
+                        </div>
                         
-                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
-                        ?>
-                            <?php if ($i == $pagina_actual): ?>
-                                <span class="current"><?php echo $i; ?></span>
+                        <!-- Paginación -->
+                        <div class="flex space-x-1">
+                            <?php if ($pagina_actual > 1): ?>
+                                <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
                             <?php else: ?>
-                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </span>
+                                <span class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-left"></i>
+                                </span>
                             <?php endif; ?>
-                        <?php endfor; ?>
-                        
-                        <?php if ($pagina_actual < $total_paginas): ?>
-                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
-                            <a href="?pagina=<?php echo $total_paginas; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
-                        <?php else: ?>
-                            <span class="disabled">Siguiente ›</span>
-                            <span class="disabled">Última »</span>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="excel-table">
-                        <thead>
-                            <tr>
-                                <?php if (!empty($encabezados)): ?>
-                                    <?php foreach ($encabezados as $header): ?>
-                                        <th><?php echo htmlspecialchars($header); ?></th>
-                                    <?php endforeach; ?>
+                            
+                            <?php
+                            $inicio_paginas = max(1, $pagina_actual - 2);
+                            $fin_paginas = min($total_paginas, $pagina_actual + 2);
+                            
+                            for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
+                            ?>
+                                <?php if ($i == $pagina_actual): ?>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                        <?php echo $i; ?>
+                                    </span>
+                                <?php else: ?>
+                                    <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        <?php echo $i; ?>
+                                    </a>
                                 <?php endif; ?>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($datos_pagina as $fila): ?>
-                                <tr>
-                                    <?php foreach ($fila as $cell): ?>
-                                        <td><?php echo htmlspecialchars($cell); ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Controles de paginación (abajo) -->
-                <div class="pagination-controls">
-                    <div class="records-selector">
-                        <label for="registros2">Mostrar:</label>
-                        <select id="registros2" onchange="cambiarRegistros(this.value)">
-                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
-                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
-                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
-                        </select>
-                    </div>
-                    
-                    <div class="pagination-info">
-                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_registros); ?> de <?php echo $total_registros; ?> registros
-                    </div>
-                    
-                    <div class="pagination">
-                        <?php if ($pagina_actual > 1): ?>
-                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
-                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
-                        <?php else: ?>
-                            <span class="disabled">« Primera</span>
-                            <span class="disabled">‹ Anterior</span>
-                        <?php endif; ?>
-                        
-                        <?php
-                        $inicio_paginas = max(1, $pagina_actual - 2);
-                        $fin_paginas = min($total_paginas, $pagina_actual + 2);
-                        
-                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
-                        ?>
-                            <?php if ($i == $pagina_actual): ?>
-                                <span class="current"><?php echo $i; ?></span>
+                            <?php endfor; ?>
+                            
+                            <?php if ($pagina_actual < $total_paginas): ?>
+                                <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                                <a href="?pagina=<?php echo $total_paginas; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
                             <?php else: ?>
-                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
+                                <span class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-right"></i>
+                                </span>
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </span>
                             <?php endif; ?>
-                        <?php endfor; ?>
-                        
-                        <?php if ($pagina_actual < $total_paginas): ?>
-                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
-                            <a href="?pagina=<?php echo $total_paginas; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
-                        <?php else: ?>
-                            <span class="disabled">Siguiente ›</span>
-                            <span class="disabled">Última »</span>
-                        <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabla de datos -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <?php if (!empty($encabezados)): ?>
+                                        <?php foreach ($encabezados as $header): ?>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <?php echo htmlspecialchars($header); ?>
+                                            </th>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($datos_pagina as $fila): ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <?php foreach ($fila as $cell): ?>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($cell); ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         <?php else: ?>
-            <div class="no-data">
-                <h3>📄 No hay datos para mostrar</h3>
-                <p>Sube un archivo CSV para ver los datos de contratos aquí.</p>
+            <!-- Mensaje cuando no hay datos -->
+            <!-- <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6 text-center">
+                    <i class="fas fa-file-alt text-gray-400 text-4xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No hay datos para mostrar</h3>
+                    <p class="text-gray-500">Sube un archivo CSV para ver los datos de contratos aquí.</p>
+                </div>
             </div>
-        <?php endif; ?>
+        <?php endif; ?> -->
         
-        <!-- Sección de contratos guardados en la base de datos -->
+        <!-- Sección de Contratos Guardados en BD -->
         <?php if ($total_contratos_bd > 0): ?>
-            <div class="excel-section">
-                <h2 class="upload-title">💾 Contratos Guardados en Base de Datos</h2>
-                
-                <div class="data-summary">
-                    <h4>📊 Resumen de Contratos Guardados</h4>
-                    <p><strong>Total de contratos guardados:</strong> <?php echo $total_contratos_bd; ?></p>
-                    <p><strong>Registros por página:</strong> <?php echo $registros_por_pagina; ?></p>
-                    <p><strong>Página actual:</strong> <?php echo $pagina_actual; ?> de <?php echo $total_paginas_bd; ?></p>
-                </div>
-                
-                <!-- Controles de paginación para contratos BD -->
-                <div class="pagination-controls">
-                    <div class="records-selector">
-                        <label for="registros_bd">Mostrar:</label>
-                        <select id="registros_bd" onchange="cambiarRegistrosBD(this.value)">
-                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
-                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
-                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
-                        </select>
-                    </div>
+            <div class="bg-white shadow rounded-lg mt-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <!-- <h3 class="text-lg leading-6 font-medium text-gray-900 mb-6">
+                        <i class="fas fa-database text-purple-500 mr-2"></i>
+                        Contratos Guardados en Base de Datos
+                    </h3> -->
                     
-                    <div class="pagination-info">
-                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_contratos_bd); ?> de <?php echo $total_contratos_bd; ?> contratos
-                    </div>
+                    <!-- Resumen de contratos guardados -->
+                    <!-- <div class="bg-purple-50 border-l-4 border-purple-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-bar text-purple-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-purple-800">Resumen de Contratos Guardados</h4>
+                                <div class="mt-2 text-sm text-purple-700">
+                                    <p><strong>Total de contratos guardados:</strong> <?php echo $total_contratos_bd; ?></p>
+                                    <p><strong>Registros por página:</strong> <?php echo $registros_por_pagina; ?></p>
+                                    <p><strong>Página actual:</strong> <?php echo $pagina_actual; ?> de <?php echo $total_paginas_bd; ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
                     
-                    <div class="pagination">
-                        <?php if ($pagina_actual > 1): ?>
-                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
-                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
-                        <?php else: ?>
-                            <span class="disabled">« Primera</span>
-                            <span class="disabled">‹ Anterior</span>
-                        <?php endif; ?>
+                    <!-- Controles de paginación para contratos BD -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+                        <div class="flex items-center space-x-2">
+                            <label for="registros_bd" class="text-sm font-medium text-gray-700">Mostrar:</label>
+                            <select id="registros_bd" onchange="cambiarRegistrosBD(this.value)" class="border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
+                                <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
+                                <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
+                            </select>
+                        </div>
                         
-                        <?php
-                        $inicio_paginas = max(1, $pagina_actual - 2);
-                        $fin_paginas = min($total_paginas_bd, $pagina_actual + 2);
+                        <div class="text-sm text-gray-700">
+                            Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_contratos_bd); ?> de <?php echo $total_contratos_bd; ?> contratos
+                        </div>
                         
-                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
-                        ?>
-                            <?php if ($i == $pagina_actual): ?>
-                                <span class="current"><?php echo $i; ?></span>
+                        <!-- Paginación para contratos BD -->
+                        <div class="flex space-x-1">
+                            <?php if ($pagina_actual > 1): ?>
+                                <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
                             <?php else: ?>
-                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </span>
+                                <span class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-left"></i>
+                                </span>
                             <?php endif; ?>
-                        <?php endfor; ?>
-                        
-                        <?php if ($pagina_actual < $total_paginas_bd): ?>
-                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
-                            <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
-                        <?php else: ?>
-                            <span class="disabled">Siguiente ›</span>
-                            <span class="disabled">Última »</span>
-                        <?php endif; ?>
+                            
+                            <?php
+                            $inicio_paginas = max(1, $pagina_actual - 2);
+                            $fin_paginas = min($total_paginas_bd, $pagina_actual + 2);
+                            
+                            for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
+                            ?>
+                                <?php if ($i == $pagina_actual): ?>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-purple-500 bg-purple-50 text-sm font-medium text-purple-600">
+                                        <?php echo $i; ?>
+                                    </span>
+                                <?php else: ?>
+                                    <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        <?php echo $i; ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            
+                            <?php if ($pagina_actual < $total_paginas_bd): ?>
+                                <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                                <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            <?php else: ?>
+                                <span class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-right"></i>
+                                </span>
+                                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </span>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="excel-table">
-                        <thead>
-                            <tr>
-                                <th>AÑO</th>
-                                <th>Empresa</th>
-                                <th>CLIENTE</th>
-                                <th>No contrato</th>
-                                <th>Valor en pesos sin IVA</th>
-                                <th>Valor en dólares</th>
-                                <th>Descripción</th>
-                                <th>Categoría</th>
-                                <th>Valor Mensual</th>
-                                <th>Observaciones</th>
-                                <th>Fecha de Inicio</th>
-                                <th>Fecha de Vencimiento</th>
-                                <th>Valor Facturado</th>
-                                <th>% Ejecución</th>
-                                <th>Valor Pendiente</th>
-                                <th>Estado</th>
-                                <th>No de horas</th>
-                                <th>Factura No</th>
-                                <th>No de Póliza</th>
-                                <th>Fecha Vencimiento Póliza</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($contratos_bd as $contrato): ?>
+                    
+                    <!-- Tabla de contratos guardados -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <td><?php echo htmlspecialchars($contrato['ano'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['empresa'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['cliente'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['no_contrato'] ?? ''); ?></td>
-                                    <td><?php echo $contrato['valor_pesos_sin_iva'] ? '$' . number_format($contrato['valor_pesos_sin_iva'], 2) : ''; ?></td>
-                                    <td><?php echo $contrato['valor_dolares'] ? '$' . number_format($contrato['valor_dolares'], 2) : ''; ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['descripcion'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['categoria'] ?? ''); ?></td>
-                                    <td><?php echo $contrato['valor_mensual'] ? '$' . number_format($contrato['valor_mensual'], 2) : ''; ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['observaciones'] ?? ''); ?></td>
-                                    <td><?php echo $contrato['fecha_inicio'] ? date('d/m/Y', strtotime($contrato['fecha_inicio'])) : ''; ?></td>
-                                    <td><?php echo $contrato['fecha_vencimiento'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento'])) : ''; ?></td>
-                                    <td><?php echo $contrato['valor_facturado'] ? '$' . number_format($contrato['valor_facturado'], 2) : ''; ?></td>
-                                    <td><?php echo $contrato['porcentaje_ejecucion'] ? $contrato['porcentaje_ejecucion'] . '%' : ''; ?></td>
-                                    <td><?php echo $contrato['valor_pendiente_ejecutar'] ? '$' . number_format($contrato['valor_pendiente_ejecutar'], 2) : ''; ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['estado'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['no_horas'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['factura_no'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($contrato['no_poliza'] ?? ''); ?></td>
-                                    <td><?php echo $contrato['fecha_vencimiento_poliza'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento_poliza'])) : ''; ?></td>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AÑO</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CLIENTE</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No contrato</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor en pesos sin IVA</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor en dólares</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Mensual</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Inicio</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Vencimiento</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Facturado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Ejecución</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Pendiente</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No de horas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura No</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No de Póliza</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Vencimiento Póliza</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Controles de paginación (abajo) para contratos BD -->
-                <div class="pagination-controls">
-                    <div class="records-selector">
-                        <label for="registros_bd2">Mostrar:</label>
-                        <select id="registros_bd2" onchange="cambiarRegistrosBD(this.value)">
-                            <option value="25" <?php echo $registros_por_pagina == 25 ? 'selected' : ''; ?>>25 registros</option>
-                            <option value="50" <?php echo $registros_por_pagina == 50 ? 'selected' : ''; ?>>50 registros</option>
-                            <option value="100" <?php echo $registros_por_pagina == 100 ? 'selected' : ''; ?>>100 registros</option>
-                        </select>
-                    </div>
-                    
-                    <div class="pagination-info">
-                        Mostrando <?php echo $inicio + 1; ?> - <?php echo min($inicio + $registros_por_pagina, $total_contratos_bd); ?> de <?php echo $total_contratos_bd; ?> contratos
-                    </div>
-                    
-                    <div class="pagination">
-                        <?php if ($pagina_actual > 1): ?>
-                            <a href="?pagina=1&registros=<?php echo $registros_por_pagina; ?>">« Primera</a>
-                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&registros=<?php echo $registros_por_pagina; ?>">‹ Anterior</a>
-                        <?php else: ?>
-                            <span class="disabled">« Primera</span>
-                            <span class="disabled">‹ Anterior</span>
-                        <?php endif; ?>
-                        
-                        <?php
-                        $inicio_paginas = max(1, $pagina_actual - 2);
-                        $fin_paginas = min($total_paginas_bd, $pagina_actual + 2);
-                        
-                        for ($i = $inicio_paginas; $i <= $fin_paginas; $i++):
-                        ?>
-                            <?php if ($i == $pagina_actual): ?>
-                                <span class="current"><?php echo $i; ?></span>
-                            <?php else: ?>
-                                <a href="?pagina=<?php echo $i; ?>&registros=<?php echo $registros_por_pagina; ?>"><?php echo $i; ?></a>
-                            <?php endif; ?>
-                        <?php endfor; ?>
-                        
-                        <?php if ($pagina_actual < $total_paginas_bd): ?>
-                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&registros=<?php echo $registros_por_pagina; ?>">Siguiente ›</a>
-                            <a href="?pagina=<?php echo $total_paginas_bd; ?>&registros=<?php echo $registros_por_pagina; ?>">Última »</a>
-                        <?php else: ?>
-                            <span class="disabled">Siguiente ›</span>
-                            <span class="disabled">Última »</span>
-                        <?php endif; ?>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($contratos_bd as $contrato): ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['ano'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['empresa'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['cliente'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['no_contrato'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['valor_pesos_sin_iva'] ? '$' . number_format($contrato['valor_pesos_sin_iva'], 2) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['valor_dolares'] ? '$' . number_format($contrato['valor_dolares'], 2) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['descripcion'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['categoria'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['valor_mensual'] ? '$' . number_format($contrato['valor_mensual'], 2) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['observaciones'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['fecha_inicio'] ? date('d/m/Y', strtotime($contrato['fecha_inicio'])) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['fecha_vencimiento'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento'])) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['valor_facturado'] ? '$' . number_format($contrato['valor_facturado'], 2) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['porcentaje_ejecucion'] ? $contrato['porcentaje_ejecucion'] . '%' : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['valor_pendiente_ejecutar'] ? '$' . number_format($contrato['valor_pendiente_ejecutar'], 2) : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['estado'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['no_horas'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['factura_no'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($contrato['no_poliza'] ?? ''); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $contrato['fecha_vencimiento_poliza'] ? date('d/m/Y', strtotime($contrato['fecha_vencimiento_poliza'])) : ''; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         <?php endif; ?>
-            </div>
+    </main>
+
+    <script>
+        function cambiarRegistros(valor) {
+            // Obtener la página actual de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const paginaActual = urlParams.get('pagina') || 1;
+            
+            // Redirigir con los nuevos parámetros
+            window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+        }
         
-        <script>
-            function cambiarRegistros(valor) {
-                // Obtener la página actual de la URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const paginaActual = urlParams.get('pagina') || 1;
+        function cambiarRegistrosBD(valor) {
+            // Obtener la página actual de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const paginaActual = urlParams.get('pagina') || 1;
+            
+            // Redirigir con los nuevos parámetros
+            window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+        }
+        
+        // Sincronizar selectores de datos CSV
+        document.addEventListener('DOMContentLoaded', function() {
+            const selector1 = document.getElementById('registros');
+            const selector2 = document.getElementById('registros2');
+            
+            if (selector1 && selector2) {
+                selector1.addEventListener('change', function() {
+                    selector2.value = this.value;
+                });
                 
-                // Redirigir con los nuevos parámetros
-                window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
+                selector2.addEventListener('change', function() {
+                    selector1.value = this.value;
+                });
             }
             
-            function cambiarRegistrosBD(valor) {
-                // Obtener la página actual de la URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const paginaActual = urlParams.get('pagina') || 1;
-                
-                // Redirigir con los nuevos parámetros
-                window.location.href = `?pagina=${paginaActual}&registros=${valor}`;
-            }
+            // Sincronizar selectores de contratos BD
+            const selectorBD1 = document.getElementById('registros_bd');
+            const selectorBD2 = document.getElementById('registros_bd2');
             
-            // Sincronizar selectores de datos CSV
-            document.addEventListener('DOMContentLoaded', function() {
-                const selector1 = document.getElementById('registros');
-                const selector2 = document.getElementById('registros2');
+            if (selectorBD1 && selectorBD2) {
+                selectorBD1.addEventListener('change', function() {
+                    selectorBD2.value = this.value;
+                });
                 
-                if (selector1 && selector2) {
-                    selector1.addEventListener('change', function() {
-                        selector2.value = this.value;
-                    });
-                    
-                    selector2.addEventListener('change', function() {
-                        selector1.value = this.value;
-                    });
-                }
-                
-                // Sincronizar selectores de contratos BD
-                const selectorBD1 = document.getElementById('registros_bd');
-                const selectorBD2 = document.getElementById('registros_bd2');
-                
-                if (selectorBD1 && selectorBD2) {
-                    selectorBD1.addEventListener('change', function() {
-                        selectorBD2.value = this.value;
-                    });
-                    
-                    selectorBD2.addEventListener('change', function() {
-                        selectorBD1.value = this.value;
-                    });
-                }
-            });
-        </script>
-    </body>
+                selectorBD2.addEventListener('change', function() {
+                    selectorBD1.value = this.value;
+                });
+            }
+        });
+    </script>
+</body>
 </html>
